@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Build and deploy to staging
+name: Cypress Test
 
 # Controls when the action will run. 
 on:
@@ -23,27 +23,24 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: checkout
         uses: actions/checkout@v2
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
+      - name: Cypress run
+        uses: cypress-io/login-action@v1
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          username: ${{ secrets.CYPRESS_HUB_USERNAME }}
+          password: ${{ secrets.CYPRESS_HUB_ACCESS_TOKEN }}
 
-      - name: Set up Docker Buildx
+      - name: Set up CYPRESS Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v1
+        uses: cypress/setup-buildx-action@v1
 
       - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          context: ./
-          file: ./docker/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/product-factory-frontend:staging
-
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+        id: cypress_build
+        uses: cypress/build-push-action@v2
+        
+      - with:
+        build: npm run build
+        Start:npm_start
+     
 
   deploy:
     runs-on: ubuntu-latest
